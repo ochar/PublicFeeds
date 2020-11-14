@@ -120,15 +120,27 @@ public class FeedResource {
 		
 		List<Item> items = FETCHER.fetchWithTags(tags, anyTags);
 		
+		itemCache.saveAll(items);
+		
 		items = processSearch(items, queryString, minDate, maxDate);
 		
 		return new ResponseEntity<>(processPaging(items, pageSize, pageNumber), HttpStatus.OK);
 	}
 	
+	@GetMapping("/query/tags/save")
+	public List<Item> saveQueryTags(
+			@RequestParam(name = "tags") List<String> tags,
+			@RequestParam(name = "anyTags", defaultValue = "false") boolean anyTags)
+			throws IOException {
+		List<Item> items = FETCHER.fetchWithTags(tags, anyTags);
+		service.saveItems(items);
+		return items;
+	}
+	
 	@GetMapping("/query/ids")
 	public ResponseEntity queryIds(
-			@RequestParam(name = "ids") List<String> ids
-			,
+			@RequestParam(name = "ids") List<String> ids,
+			
 			@RequestParam(name = "q", required = false) String queryString,
 			
 			@RequestParam(name = "minDate", required = false)
@@ -146,6 +158,14 @@ public class FeedResource {
 		items = processSearch(items, queryString, minDate, maxDate);
 
 		return new ResponseEntity<>(processPaging(items, pageSize, pageNumber), HttpStatus.OK);
+	}
+	
+	@GetMapping("/query/ids/save")
+	public List<Item> saveQueryIds(@RequestParam(name = "ids") List<String> ids)
+			throws IOException {
+		List<Item> items = FETCHER.fetchWithIds(ids);
+		service.saveItems(items);
+		return items;
 	}
 	
 	
