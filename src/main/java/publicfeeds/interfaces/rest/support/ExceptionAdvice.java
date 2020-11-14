@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 /**
  *
@@ -19,6 +20,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class ExceptionAdvice {
 	
 	
+	
+	@ResponseBody
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
+	public ErrorResponse handleMismatchArgumentType(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException ex) {
+		return new ErrorResponse("400", ex);
+	}
 	
 	@ResponseBody
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
