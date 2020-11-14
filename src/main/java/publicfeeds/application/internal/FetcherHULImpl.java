@@ -89,9 +89,17 @@ public class FetcherHULImpl implements Fetcher {
 	private ConcurrentHashMap<String, PublicFeedRespJson> respCache = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<String, List<Item>> itemsCache = new ConcurrentHashMap<>();
 	
+	private String appendUrlQuery(String urlString, String queryString) {
+		if (urlString.contains("?")) {
+			return urlString + "&" + queryString;
+		} else {
+			return urlString + "?" + queryString;
+		}
+	}
+	
 	@Override
 	public List<Item> fetchWithQuery(String queryString) {
-		String reqUrl = DEFAULT_URL + "?" + queryString;
+		String reqUrl = appendUrlQuery(DEFAULT_URL, queryString);
 		
 		PublicFeedRespJson resp = null;
 		List<Item> resultItems = null;
