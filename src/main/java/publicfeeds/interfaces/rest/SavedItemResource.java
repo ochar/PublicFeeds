@@ -38,7 +38,7 @@ public class SavedItemResource {
 		if (foundItem.isPresent()) {
 			return new ResponseEntity(foundItem.get(), HttpStatus.OK);
 		} else {
-			return new ResponseEntity(new HashMap<String, String>(), HttpStatus.NOT_FOUND);
+			return new ResponseEntity(new HashMap<String, String>(0), HttpStatus.NOT_FOUND);
 		}
 	}
 	
