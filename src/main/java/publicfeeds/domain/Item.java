@@ -5,16 +5,24 @@
  */
 package publicfeeds.domain;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 
 /**
  *
  * @author io
  */
-public class Item {
+@Entity
+public class Item implements Serializable {
 	
+	@Id
 	private String id;
 	
 	private String title;
@@ -25,13 +33,15 @@ public class Item {
 	
 	private Instant takenDate;
 	
+	@Lob
 	private String htmlDescription;
 	
 	private Instant publishedDate;
-
+	
+	@ManyToOne(cascade = CascadeType.ALL)
 	private Author author;
 
-	public Item() {
+	protected Item() {
 	}
 
 	public Item(String id, String title, String link, Media media, 

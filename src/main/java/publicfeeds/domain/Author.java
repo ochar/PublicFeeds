@@ -5,21 +5,27 @@
  */
 package publicfeeds.domain;
 
+import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 /**
  *
  * @author io
  */
-public class Author {
+@Entity
+public class Author implements Serializable {
 	
 	public static final String profileBaseUrl = "https://www.flickr.com/people/";
 	
+	@Id
 	private String id;
 	
 	private String name;
 	
 	private String profileUrl = "";
 
-	public Author() {
+	protected Author() {
 	}
 	
 	public Author(String id, String name) {

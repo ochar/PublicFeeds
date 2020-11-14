@@ -5,27 +5,40 @@
  */
 package publicfeeds.domain;
 
+import java.io.Serializable;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Embeddable;
+import javax.persistence.Lob;
 
 /**
  *
  * @author io
  */
-public class Media {
+@Embeddable
+public class Media implements Serializable {
 	
+	@Column(name = "media_content_url")
 	private String contentUrl;
 	
+	@Column(name = "media_title")
 	private String title;
 	
+	@Column(name = "media_html_description")
+	@Lob
 	private String htmlDescription;
 	
+	@Column(name = "media_thumbnail_url")
 	private String thumbnailUrl;
 	
+	@Column(name = "media_credit")
 	private String credit;
 	
+	@ElementCollection
 	private List<String> tags;
 
-	public Media() {
+	protected Media() {
 	}
 
 	public Media(String contentUrl, String title, List<String> tags) {
