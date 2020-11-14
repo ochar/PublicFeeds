@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import publicfeeds.application.Fetcher;
+import publicfeeds.application.internal.Service;
+import publicfeeds.application.internal.jpa.ItemRepository;
 import publicfeeds.domain.Item;
 import publicfeeds.interfaces.rest.support.PageResponse;
 import publicfeeds.interfaces.support.Page;
@@ -38,6 +40,8 @@ public class FeedResource {
 	@Autowired
 	private Fetcher FETCHER;
 	
+	@Autowired 
+	private Service service;
 	
 	
 	@GetMapping("/current")
@@ -60,6 +64,14 @@ public class FeedResource {
 
 		return new ResponseEntity<>(processPaging(items, pageSize, pageNumber), HttpStatus.OK);
 	}
+	
+	@GetMapping("/current/save")
+	public List<Item> saveCurrentFeed() throws IOException {
+		List<Item> items = FETCHER.fetchPlain();
+		service.saveItems(items);
+		return items;
+	}
+	
 	
 	
 	private <T> PageResponse<T> processPaging(List<T> items, int pageSize, int pageNumber) {
