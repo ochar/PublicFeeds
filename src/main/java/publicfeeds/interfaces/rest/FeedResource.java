@@ -11,7 +11,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import static java.util.stream.Collectors.toList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,8 +23,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import publicfeeds.application.Fetcher;
+import publicfeeds.application.internal.Service;
 import publicfeeds.domain.Item;
 import publicfeeds.interfaces.rest.support.PageResponse;
 import publicfeeds.interfaces.support.Page;
@@ -38,6 +42,11 @@ public class FeedResource {
 	@Autowired
 	private Fetcher FETCHER;
 	
+	@Autowired 
+	private Service service;
+	
+	@Autowired
+	private ItemCache itemCache;
 	
 	
 	@GetMapping("/current")
@@ -57,12 +66,43 @@ public class FeedResource {
 		List<Item> items = FETCHER.fetchPlain();
 		
 		items = processSearch(items, queryString, minDate, maxDate);
+		
+		itemCache.saveAll(items);
 
 		return new ResponseEntity<>(processPaging(items, pageSize, pageNumber), HttpStatus.OK);
 	}
 	
+	@GetMapping("/current/save")
+	public List<Item> saveCurrentFeed() throws IOException {
+		List<Item> items = FETCHER.fetchPlain();
+		service.saveItems(items);
+		return items;
+	}
+	
+	@GetMapping("/save")
+	public ResponseEntity saveFeeds(@RequestParam(name = "itemIds") List<String> itemIds) 
+			throws IOException {
+		Map<String, String> resultMap = new HashMap<>(itemIds.size());
+		
+		for (String id : itemIds) {
+			Item cachedItem = itemCache.get(id);
+			if (cachedItem != null) {
+				service.saveItem(cachedItem);
+				String uriString = MvcUriComponentsBuilder
+						.fromController(SavedItemResource.class)
+						.pathSegment(id).toUriString();
+				resultMap.put(id, uriString);
+				
+			} else {
+				resultMap.put(id, "NOT FOUND");
+			}
+		}
+		return new ResponseEntity(resultMap, HttpStatus.CREATED);
+	}
+	
+	
 	@GetMapping("/query/tags")
-	public ResponseEntity query(
+	public ResponseEntity queryTags(
 			@RequestParam(name = "tags") List<String> tags,
 			@RequestParam(name = "anyTags", defaultValue = "false") boolean anyTags,
 			
@@ -86,7 +126,7 @@ public class FeedResource {
 	}
 	
 	@GetMapping("/query/ids")
-	public ResponseEntity query(
+	public ResponseEntity queryIds(
 			@RequestParam(name = "ids") List<String> ids
 			,
 			@RequestParam(name = "q", required = false) String queryString,
