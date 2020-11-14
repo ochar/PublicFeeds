@@ -85,6 +85,29 @@ public class FeedResource {
 		return new ResponseEntity<>(processPaging(items, pageSize, pageNumber), HttpStatus.OK);
 	}
 	
+	@GetMapping("/query/ids")
+	public ResponseEntity query(
+			@RequestParam(name = "ids") List<String> ids
+			,
+			@RequestParam(name = "q", required = false) String queryString,
+			
+			@RequestParam(name = "minDate", required = false)
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate minDate,
+			
+			@RequestParam(name = "maxDate", required = false)
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate maxDate,
+			
+			@RequestParam(name = "pageSize", defaultValue = "20") int pageSize,
+			@RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber)
+			throws IOException {
+
+		List<Item> items = FETCHER.fetchWithIds(ids);
+
+		items = processSearch(items, queryString, minDate, maxDate);
+
+		return new ResponseEntity<>(processPaging(items, pageSize, pageNumber), HttpStatus.OK);
+	}
+	
 	
 	
 	private <T> PageResponse<T> processPaging(List<T> items, int pageSize, int pageNumber) {

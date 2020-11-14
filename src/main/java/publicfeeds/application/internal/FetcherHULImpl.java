@@ -153,7 +153,7 @@ public class FetcherHULImpl implements Fetcher {
 	
 	@Override
 	public List<Item> fetchWithIds(List<String> ids) {
-		String queryString = DEFAULT_URL;
+		String queryString = "";
 		
 		String encodedIdsParam = encodeParamValues(ids);
 		
