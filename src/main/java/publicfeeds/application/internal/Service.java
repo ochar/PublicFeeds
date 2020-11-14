@@ -5,6 +5,7 @@
  */
 package publicfeeds.application.internal;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import static java.util.stream.Collectors.toList;
@@ -13,9 +14,11 @@ import publicfeeds.application.internal.jpa.AuthorRepository;
 import publicfeeds.application.internal.jpa.ItemCommentRepository;
 import publicfeeds.application.internal.jpa.ItemLikeReposistory;
 import publicfeeds.application.internal.jpa.ItemRepository;
+import publicfeeds.application.internal.jpa.UserEventRepository;
 import publicfeeds.domain.Item;
 import publicfeeds.domain.ItemComment;
 import publicfeeds.domain.ItemLike;
+import publicfeeds.domain.UserEvent;
 
 /**
  *
@@ -28,6 +31,8 @@ public class Service {
 	@Autowired private AuthorRepository authorRepo;
 	@Autowired private ItemLikeReposistory likeRepo;
 	@Autowired private ItemCommentRepository commentRepo;
+	
+	@Autowired private UserEventRepository eventRepo;
 	
 	
 	public Optional<Item> getItemById(String id) {
@@ -96,7 +101,9 @@ public class Service {
 			if (foundAny.isPresent()) {
 				return foundAny.get();
 			} else {
-				return likeRepo.save(new ItemLike(foundItem.get(), username));
+				ItemLike saved = likeRepo.save(new ItemLike(foundItem.get(), username));
+				createUserEvent(saved.getUsername(), saved.getItem().getId(), LIKE_EVENT);
+				return saved;
 			}
 			
 		} else {
@@ -115,6 +122,7 @@ public class Service {
 			
 			if (foundAny.isPresent()) {
 				likeRepo.delete(foundAny.get());
+				createUserEvent(username, itemId, UNLIKE_EVENT);
 			}
 			return true;
 			
@@ -134,7 +142,9 @@ public class Service {
 	public ItemComment postCommentToItem(String content, String itemId, String username) {
 		Optional<Item> foundItem = getItemById(itemId);
 		if (foundItem.isPresent()) {
-			return commentRepo.save(new ItemComment(content, foundItem.get(), username));
+			ItemComment ic = commentRepo.save(new ItemComment(content, foundItem.get(), username));
+			createUserEvent(username, itemId, POST_COMMENT_EVENT);
+			return ic;
 		} else {
 			return null;
 		}
@@ -145,7 +155,10 @@ public class Service {
 		if (foundComment.isPresent()) {
 			ItemComment ic = foundComment.get();
 			ic.setContent(content);
-			return commentRepo.save(ic);
+			
+			ItemComment saved = commentRepo.save(ic);
+			createUserEvent(saved.getUsername(), saved.getItem().getId(), EDIT_COMMENT_EVENT);
+			return saved;
 			
 		} else {
 			return null;
@@ -153,13 +166,38 @@ public class Service {
 	}
 	
 	public boolean deleteComment(long commentId) {
-		if (commentRepo.findById(commentId).isPresent()) {
+		Optional<ItemComment> foundComment = commentRepo.findById(commentId);
+		if (foundComment.isPresent()) {
 			commentRepo.deleteById(commentId);
+			
+			ItemComment get = foundComment.get();
+			createUserEvent(get.getUsername(), get.getItem().getId(), DELETE_COMMENT_EVENT);
 			return true;
 		} else {
 			return false;
 		}
 	}
 	
+	
+	private static final String LIKE_EVENT = " like item ";
+	private static final String UNLIKE_EVENT = " unlike item ";
+	private static final String POST_COMMENT_EVENT = " posted a comment on item ";
+	private static final String EDIT_COMMENT_EVENT = " edited a comment on item ";
+	private static final String DELETE_COMMENT_EVENT = " deleted a comment on item ";
+	
+	private UserEvent createUserEvent(String username, String itemId, String eventMessage) {
+		return eventRepo.save(new UserEvent(Instant.now(), username,
+				username + eventMessage + itemId, 
+				itemId));
+	}
+	
+	
+	public List<UserEvent> getUserEventsByItemId(String itemId) {
+		return eventRepo.findByItemId(itemId);
+	}
+	
+	public List<UserEvent> getUserEventsByUsername(String username) {
+		return eventRepo.findByUsername(username);
+	}
 	
 }
