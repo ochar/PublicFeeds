@@ -9,6 +9,9 @@ import com.fasterxml.jackson.databind.util.StdConverter;
 import publicfeeds.domain.Item;
 
 /**
+ * Converter for Jackson serializer.
+ * Converts an Item object to string of its Id.
+ * For class ItemLike and ItemComment.
  *
  * @author io
  */
