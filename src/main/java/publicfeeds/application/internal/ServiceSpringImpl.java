@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import publicfeeds.application.Service;
 import publicfeeds.application.internal.jpa.AuthorRepository;
 import publicfeeds.application.internal.jpa.ItemCommentRepository;
-import publicfeeds.application.internal.jpa.ItemLikeReposistory;
+import publicfeeds.application.internal.jpa.ItemLikeRepository;
 import publicfeeds.application.internal.jpa.ItemRepository;
 import publicfeeds.application.internal.jpa.UserEventRepository;
 import publicfeeds.domain.Item;
@@ -32,7 +32,7 @@ public class ServiceSpringImpl implements Service {
 	
 	@Autowired private ItemRepository itemRepo;
 	@Autowired private AuthorRepository authorRepo;
-	@Autowired private ItemLikeReposistory likeRepo;
+	@Autowired private ItemLikeRepository likeRepo;
 	@Autowired private ItemCommentRepository commentRepo;
 	
 	@Autowired private UserEventRepository eventRepo;
