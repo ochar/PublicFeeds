@@ -1,2 +1,7 @@
 server:
     port: 5050
+
+appDebug: false
+
+jwtSecret: 973rerjvn[]=<>?
+jwtExprTime: 7200000
