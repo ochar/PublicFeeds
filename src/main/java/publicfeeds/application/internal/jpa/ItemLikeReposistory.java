@@ -10,13 +10,26 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import publicfeeds.domain.ItemLike;
 
 /**
+ * Spring Data JPA repository for accessing ItemLike type object.
  *
  * @author io
  */
 public interface ItemLikeReposistory extends JpaRepository<ItemLike, Long> {
 	
+	/**
+	 * Retrieves ItemLikes from an Item.
+	 * 
+	 * @param itemId id of Item which item likes is to be retrieved.
+	 * @return List of item likes found. 
+	 */
 	List<ItemLike> findByItemId(String itemId);
 	
+	/**
+	 * Finds ItemLikes from user with username.
+	 * 
+	 * @param username username of user which item likes to be retrieved.
+	 * @return List of item likes found. 
+	 */
 	List<ItemLike> findByUsername(String username);
 	
 }

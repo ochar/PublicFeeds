@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import publicfeeds.domain.Author;
 
 /**
+ * Spring Data JPA repository for accessing Author type object.
  *
  * @author io
  */

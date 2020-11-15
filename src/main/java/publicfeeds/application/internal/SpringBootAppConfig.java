@@ -14,6 +14,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
+ * Main class entry point and also configuration for Spring Boot.
  *
  * @author io
  */
@@ -25,6 +26,10 @@ public class SpringBootAppConfig {
 		SpringApplication.run(SpringBootAppConfig.class, args);
 	}
 	
+	/**
+	 * Configuration for CORS.
+	 * Accept request from all origins.
+	 */
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer() {
