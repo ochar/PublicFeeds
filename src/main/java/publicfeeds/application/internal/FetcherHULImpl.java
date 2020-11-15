@@ -36,6 +36,11 @@ import publicfeeds.application.dto.json.PublicFeedRespJson;
 import publicfeeds.domain.Item;
 
 /**
+ * Fetcher implementation using HttpURLConnection.
+ * 
+ * Resulted DTO response will be cached. If the resource fetched is not modified, 
+ * result from cache will be returned.
+ * Response string is parse to DTO using Jackson ObjectMapper.
  *
  * @author io
  */
@@ -50,6 +55,9 @@ public class FetcherHULImpl implements Fetcher {
 	private static final String RSS20_URL = ATOM_URL + "?format=rss2";
 	private static final String JSON_URL = ATOM_URL + "?format=json";
 	
+	/**
+	 * Default feeds url to be fetched.
+	 */
 	private static final String DEFAULT_URL = JSON_URL;
 	
 	
@@ -162,6 +170,12 @@ public class FetcherHULImpl implements Fetcher {
 		return fetchWithQuery(queryString);
 	}
 	
+	/**
+	 * Encode list of HTTP query parameters and joining them.
+	 * 
+	 * @param paramVals list of parameters to be encoded
+	 * @return string of encoded and joined parameters
+	 */
 	private String encodeParamValues(List<String> paramVals) {
 		return paramVals.stream()
 				.map(tag -> {
@@ -174,6 +188,15 @@ public class FetcherHULImpl implements Fetcher {
 				.collect(joining(","));
 	}
 	
+	/**
+	 * Fetching public feed from url using HttpURLConnection.
+	 * Will store last access time, so that next fetch can use 
+	 * If-Modified-Since header.
+	 * 
+	 * @param urlString Url of public feed to be fetched
+	 * @return An Optional of PublicFeedRespJson DTO. It is empty if fetched url
+	 * is not modified
+	 */
 	private Optional<PublicFeedRespJson> fetchUrl(String urlString) {
 		try {
 			Instant lastFetch = getUrlLastFetch(urlString);
@@ -204,6 +227,9 @@ public class FetcherHULImpl implements Fetcher {
 		}
 	}
 	
+	/**
+	 * Stores last access time of an url.
+	 */
 	private ConcurrentHashMap<String, Instant> urlLastFetch = new ConcurrentHashMap<>();
 	
 	private void setUrlLastFetch(String urlString) {
@@ -216,6 +242,13 @@ public class FetcherHULImpl implements Fetcher {
 		return urlLastFetch.get(urlString);
 	}
 	
+	/**
+	 * Read an InputStream to a String.
+	 * 
+	 * @param is InputStream to be read.
+	 * @return A String from contents of the InputStream
+	 * @throws IOException 
+	 */
 	private String inputStreamToString(InputStream is) throws IOException {
 		try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8);) {
 		
@@ -256,6 +289,9 @@ public class FetcherHULImpl implements Fetcher {
 	}
 	
 	
+	/**
+	 * Jackson ObjectMapper json parser.
+	 */
 	private static final ObjectMapper mapper;
 	
 	static {
