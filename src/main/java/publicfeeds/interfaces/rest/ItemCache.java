@@ -15,21 +15,45 @@ import org.springframework.web.context.annotation.ApplicationScope;
 import publicfeeds.domain.Item;
 
 /**
- *
+ * Cache for feed item. Used for selecting items to save.
+ * Collection is backed by {@link LinkedHashedMap} which acts as an LRU cache.
+ * 
+ * @see LinkedHashMap
  * @author io
  */
 @ApplicationScope
 @Component
 public class ItemCache {
 
+	/**
+	 * Returns the number of items in this cache.
+	 *
+	 * @return the number of items in this cache
+	 * @see LinkedHashMap#size
+	 */
 	public int size() {
 		return itemCacheMap.size();
 	}
 	
+	/**
+	 * Returns an {@link Item} from this cache which has given id.
+	 *
+	 * @param id id of Item to look for
+	 * @return the item in this cache which has given id, or {@code null} if not
+	 * found
+	 */
 	public Item get(String id) {
 		return itemCacheMap.get(id);
 	}
 	
+	/**
+	 * Returns list of {@link Item} from this cache which has id matching one of
+	 * the given ids.
+	 *
+	 * @param ids list of ids of Item to look for
+	 * @return the items in this cache which has given id, or an empty list if
+	 * none is found
+	 */
 	public List<Item> getAll(List<String> ids) {
 		return ids.stream()
 				.map(id -> itemCacheMap.get(id))
@@ -37,15 +61,39 @@ public class ItemCache {
 				.collect(toList());
 	}
 
+	/**
+	 * Returns {@code true} if this cache contains an item which has the given
+	 * id.
+	 *
+	 * @param id id of item whose presence in this cache is to be tested
+	 * @return {@code true} if this cache contains an item which has the given
+	 * id, {@code false} otherwise
+	 */
 	public boolean containsKey(String id) {
 		return itemCacheMap.containsKey(id);
 	}
 
+	/**
+	 * Save an item to this cache. If this cache already contains an item with
+	 * same id, it is replaced.
+	 *
+	 * @param item item to be saved
+	 * @return {@code true} if the item is successfully saved to the cache
+	 */
 	public boolean save(Item item) {
 		itemCacheMap.put(item.getId(), item);
 		return true;
 	}
 	
+	/**
+	 * Save all of items to this cache. If this cache already contains any item
+	 * with the same id, it will be replaced.
+	 *
+	 * @param items items to be saved in this cache
+	 * @return {@code true} if any of the items is successfully saved to the
+	 * cache
+	 * @throws NullPointerException if the specified items is null
+	 */
 	public boolean saveAll(Collection<Item> items) {
 		items.forEach(i -> {
 			itemCacheMap.put(i.getId(), i);
@@ -53,10 +101,19 @@ public class ItemCache {
 		return true;
 	}
 
+	/**
+	 * Removes an item from this cache.
+	 *
+	 * @param item item to be removed
+	 * @return {@code true} if the item is found and removed
+	 */
 	public boolean remove(Item item) {
 		return itemCacheMap.remove(item.getId(), item);
 	}
 
+	/**
+	 * Removes all items in this cache.
+	 */
 	public void clear() {
 		itemCacheMap.clear();
 	}

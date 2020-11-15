@@ -17,11 +17,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import publicfeeds.application.internal.Service;
+import publicfeeds.application.Service;
 import publicfeeds.domain.Item;
 import publicfeeds.domain.ItemLike;
 
 /**
+ * Rest endpoints serving {@link ItemLike} type object. 
  *
  * @author io
  */
@@ -32,6 +33,14 @@ public class LikeResource {
 	@Autowired Service service;
 	
 	
+	/**
+	 * Get {@link ItemLike} from an {@link Item} which has given id.
+	 *
+	 * @param itemId a query parameter, id of Item which likes to be retrieved
+	 * @return if Item is found, returns {@link ResponseEntity} with status 200
+	 * OK and containing its ItemLike, otherwise status 404 NOT FOUND and empty
+	 * body
+	 */
 	@GetMapping("/item")
 	public ResponseEntity getFromItem(@RequestParam(name = "itemId") String itemId) {
 		Optional<Item> foundItem = service.getItemById(itemId);
@@ -42,11 +51,26 @@ public class LikeResource {
 		}
 	}
 	
+	/**
+	 * Get all {@link ItemLike} from given username.
+	 *
+	 * @param username a query parameter, username which likes to be retrieved
+	 * @return list of likes with given username, empty if not found
+	 */
 	@GetMapping("/user")
 	public List<ItemLike> getFromUser(@RequestParam(name = "username") String username) {
 		return service.getLikesByUsername(username);
 	}
 	
+	/**
+	 * Creates a new like for an {@link Item} of given id and username
+	 *
+	 * @param itemId a query parameter, id of item which the like is for
+	 * @param username a query parameter, username which the like is from
+	 * @return if corresponding Item is found and like successfully created,
+	 * returns {@link ResponseEntity} with status 200 OK and containing the
+	 * ItemLike, otherwise status 404 NOT FOUND and empty body
+	 */
 	@PutMapping
 	public ResponseEntity like(
 			@RequestParam(name = "itemId") String itemId, 
@@ -60,6 +84,15 @@ public class LikeResource {
 		}
 	}
 	
+	/**
+	 * Deletes a like for an {@link Item} of given id and username
+	 *
+	 * @param itemId a query parameter, id of item which the like is for
+	 * @param username a query parameter, username which the like is from
+	 * @return if corresponding Item is found and like successfully deleted,
+	 * returns {@link ResponseEntity} with status 200 OK and containing String
+	 * true, otherwise status 404 NOT FOUND and empty body
+	 */
 	@DeleteMapping
 	public ResponseEntity unlike(
 			@RequestParam(name = "itemId") String itemId, 

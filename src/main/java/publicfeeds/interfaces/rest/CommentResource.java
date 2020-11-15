@@ -21,11 +21,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.HtmlUtils;
-import publicfeeds.application.internal.Service;
+import publicfeeds.application.Service;
 import publicfeeds.domain.Item;
 import publicfeeds.domain.ItemComment;
 
 /**
+ * Rest endpoints serving {@link ItemComment} type object.
  *
  * @author io
  */
@@ -35,7 +36,14 @@ public class CommentResource {
 	
 	@Autowired Service service;
 	
-	
+	/**
+	 * Get {@link ItemComment} from an {@link Item} which has given id.
+	 *
+	 * @param itemId a query parameter, id of Item which comment to be retrieved
+	 * @return if Item is found, returns {@link ResponseEntity} with status 200
+	 * OK and containing its ItemComment, otherwise status 404 NOT FOUND and 
+	 * empty body
+	 */
 	@GetMapping("/item")
 	public ResponseEntity getFromItemId(@RequestParam(name = "itemId") String itemId) {
 		Optional<Item> foundItem = service.getItemById(itemId);
@@ -46,11 +54,29 @@ public class CommentResource {
 		}
 	}
 	
+	/**
+	 * Get all {@link ItemComment} which has given username.
+	 *
+	 * @param username a query parameter, username which comments to be retrieved
+	 * @return list of comments with given username, empty if not found
+	 */
 	@GetMapping("/user")
 	public List<ItemComment> getFromUser(@RequestParam(name = "username") String username) {
 		return service.getCommentsByUsername(username);
 	}
 	
+	/**
+	 * Creates a new comment for an {@link Item} which has given id.
+	 *
+	 * @param content a request body parameter, content of the comment to be
+	 * created
+	 * @param itemId a query parameter, id of item which the new comment is for
+	 * @param username a query parameter, username which the comment is created
+	 * for
+	 * @return if corresponding Item is found and comment successfully created,
+	 * returns {@link ResponseEntity} with status 200 OK and containing the
+	 * ItemComment, otherwise status 404 NOT FOUND and empty body
+	 */
 	@PostMapping
 	public ResponseEntity postComment(
 			@RequestBody String content, 
@@ -67,6 +93,15 @@ public class CommentResource {
 		}
 	}
 	
+	/**
+	 * Updates a comment with given id.
+	 *
+	 * @param commentId a query parameter, id of the comment to be updated
+	 * @param content a query parameter, new content of the comment
+	 * @return if corresponding comment is found and comment successfully
+	 * updated, returns {@link ResponseEntity} with status 200 OK and containing
+	 * the ItemComment, otherwise status 404 NOT FOUND and empty body
+	 */
 	@PutMapping("/{commentId}")
 	public ResponseEntity editComment(@PathVariable long commentId, 
 			@RequestBody String content) {
@@ -80,6 +115,14 @@ public class CommentResource {
 		}
 	}
 	
+	/**
+	 * Deletes a comment with given id.
+	 *
+	 * @param commentId a query parameter, id of the comment to be deleted
+	 * @return if corresponding comment is found and comment successfully
+	 * deleted, returns {@link ResponseEntity} with status 200 OK and containing
+	 * String true, otherwise status 404 NOT FOUND and empty body
+	 */
 	@DeleteMapping("/{commentId}")
 	public ResponseEntity deleteComment(@PathVariable long commentId) {
 		boolean success = service.deleteComment(commentId);
