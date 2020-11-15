@@ -11,6 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Converter for Jackson deserializer.
+ * Converts a String with spaces to a List of Strings.
+ * For Tags List in PublicFeedItemJson.
  *
  * @author io
  */
@@ -19,6 +22,10 @@ public class TagsListConverter extends StdConverter<String, List<String>> {
 	@Override
 	public List<String> convert(String value) {
 		String tags = value;
+		
+		if (tags == null) {
+			return null;
+		}
 		
 		if (tags.length() < 1) {
 			return new ArrayList<>();

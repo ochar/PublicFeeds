@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toList;
 import publicfeeds.domain.Item;
 
 /**
+ * A DTO representing top level response of the public feed.
  *
  * @author io
  */
@@ -89,6 +90,11 @@ public class PublicFeedRespJson {
 				+ ", items=" + items + '}';
 	}
 	
+	/**
+	 * Shortcut methods to convert all feed items to Item domain object.
+	 * 
+	 * @return List of Item domain object contained in this DTO.
+	 */
 	public List<Item> toItems() {
 		return getItems().stream()
 				.map(itemJson -> itemJson.toItem())

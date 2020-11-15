@@ -14,6 +14,7 @@ import publicfeeds.domain.Item;
 import publicfeeds.domain.Media;
 
 /**
+ * DTO of a single feed item.
  *
  * @author io
  */
@@ -144,7 +145,11 @@ public class PublicFeedItemJson {
 				+ ", tags=" + tags + '}';
 	}
 	
-	
+	/**
+	 * Converts this feed item DTO to an Item domain object
+	 * 
+	 * @return an Item domain object with data from this DTO
+	 */
 	public Item toItem() {
 		
 		// parse author name
