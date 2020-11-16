@@ -32,6 +32,8 @@ import static org.mockito.BDDMockito.given;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -43,13 +45,16 @@ import publicfeeds.domain.Author;
 import publicfeeds.domain.Item;
 import publicfeeds.domain.Media;
 import publicfeeds.domain.UserEvent;
+import publicfeeds.interfaces.JwtFilter;
 
 /**
  *
  * @author io
  */
 @ContextConfiguration(classes = SpringBootAppConfig.class)
-@WebMvcTest(UserEventResource.class)
+@WebMvcTest(controllers = UserEventResource.class,
+		excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, 
+						classes = JwtFilter.class))
 public class UserEventResourceTest {
 	
 	@Autowired

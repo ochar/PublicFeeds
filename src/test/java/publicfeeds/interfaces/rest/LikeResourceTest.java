@@ -35,6 +35,9 @@ import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScan.Filter;
+import org.springframework.context.annotation.FilterType;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -50,13 +53,16 @@ import publicfeeds.domain.Author;
 import publicfeeds.domain.Item;
 import publicfeeds.domain.ItemLike;
 import publicfeeds.domain.Media;
+import publicfeeds.interfaces.JwtFilter;
 
 /**
  *
  * @author io
  */
 @ContextConfiguration(classes = SpringBootAppConfig.class)
-@WebMvcTest(LikeResource.class)
+@WebMvcTest(controllers = LikeResource.class,
+		excludeFilters = @Filter(type = FilterType.ASSIGNABLE_TYPE, 
+						classes = JwtFilter.class))
 public class LikeResourceTest {
 	
 	@Autowired
